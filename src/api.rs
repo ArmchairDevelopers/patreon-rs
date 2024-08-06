@@ -20,6 +20,11 @@ impl PatreonApi {
         self.call_data(request).await
     }
 
+    pub async fn member_by_id(&self, member_id: String) -> PatreonResult<CampaignMember> {
+        let request = self.member_by_id_request(member_id);
+        self.call_data(request).await
+    }
+
     pub async fn identity(&self) -> PatreonResult<User> {
         self.call_data(self.identity_request(None)).await
     }
@@ -61,6 +66,19 @@ impl PatreonApi {
                 }
             }
         }
+        self.agent.get(url)
+    }
+
+    fn member_by_id_request(
+        &self,
+        member_id: String,
+    ) -> reqwest::RequestBuilder {
+        let mut url = Url::parse(BASE_URI).unwrap();
+        url.set_path(format!("api/oauth2/v2/members/{}", member_id).as_str());
+        url.query_pairs_mut().append_pair(
+            "fields[member]",
+            "patron_status",
+        );
         self.agent.get(url)
     }
 
@@ -138,6 +156,7 @@ pub struct ApiDocument<A> {
 pub type User = ApiDocument<UserAttributes>;
 pub type Member = ApiDocument<MemberAttributes>;
 pub type Campaign = ApiDocument<CampaignAttributes>;
+pub type CampaignMember = ApiDocument<CampaignMemberAttributes>;
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct UserAttributes {
@@ -145,7 +164,6 @@ pub struct UserAttributes {
     pub last_name: String,
     pub full_name: String,
     pub vanity: Option<String>,
-    pub email: String,
     pub about: Option<String>,
     pub facebook_id: Option<String>,
     pub image_url: String,
@@ -161,7 +179,6 @@ pub struct UserAttributes {
 pub struct MemberAttributes {
     pub campaign_lifetime_support_cents: i64,
     pub currently_entitled_amount_cents: i64,
-    pub email: Option<String>,
     pub full_name: String,
     pub is_follower: bool,
     pub last_charge_date: DateTime<Utc>,
@@ -173,6 +190,11 @@ pub struct MemberAttributes {
     pub pledge_cadence: i64,
     pub pledge_relationship_start: DateTime<Utc>,
     pub will_pay_amount_cents: i64,
+}
+
+#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct CampaignMemberAttributes {
+    pub patron_status: Option<PatronStatus>,
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
