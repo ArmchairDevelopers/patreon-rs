@@ -177,19 +177,19 @@ pub struct UserAttributes {
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct MemberAttributes {
-    pub campaign_lifetime_support_cents: i64,
-    pub currently_entitled_amount_cents: i64,
+    pub campaign_lifetime_support_cents: Option<i64>,
+    pub currently_entitled_amount_cents: Option<i64>,
     pub full_name: String,
     pub is_follower: bool,
-    pub last_charge_date: DateTime<Utc>,
+    pub last_charge_date: Option<DateTime<Utc>>,
     pub last_charge_status: Option<LastChrgeStatus>,
-    pub lifetime_support_cents: i64,
-    pub next_charge_date: DateTime<Utc>,
+    pub lifetime_support_cents: Option<i64>,
+    pub next_charge_date: Option<DateTime<Utc>>,
     pub note: String,
     pub patron_status: Option<PatronStatus>,
-    pub pledge_cadence: i64,
+    pub pledge_cadence: Option<i64>,
     pub pledge_relationship_start: DateTime<Utc>,
-    pub will_pay_amount_cents: i64,
+    pub will_pay_amount_cents: Option<i64>,
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -331,10 +331,10 @@ pub type Pledge = ApiDocument<PledgeAttributes>;
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct PledgeAttributes {
-    pub amount_cents: i64,
+    pub amount_cents: Option<i64>,
     pub created_at: DateTime<Utc>,
     pub currency: String,
     pub declined_since: Option<DateTime<Utc>>,
     pub patron_pays_fees: bool,
-    pub pledge_cap_cents: i64,
+    pub pledge_cap_cents: Option<i64>,
 }

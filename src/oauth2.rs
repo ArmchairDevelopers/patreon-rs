@@ -78,7 +78,7 @@ pub struct TokensResponse {
     pub token_type: String,
     pub scope: String,
     pub refresh_token: String,
-    pub version: String,
+    pub version: Option<String>,
 }
 
 #[derive(Serialize, Deserialize)]
