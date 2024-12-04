@@ -20,9 +20,9 @@ impl PatreonApi {
         self.call_data(request).await
     }
 
-    pub async fn member_by_id(&self, member_id: String) -> PatreonResult<CampaignMember> {
+    pub async fn member_by_id(&self, member_id: String) -> PatreonResult<(CampaignMember, Vec<User>)> {
         let request = self.member_by_id_request(member_id);
-        self.call_data(request).await
+        self.call_data_and_include(request).await
     }
 
     pub async fn identity(&self) -> PatreonResult<User> {
@@ -77,7 +77,12 @@ impl PatreonApi {
         url.set_path(format!("api/oauth2/v2/members/{}", member_id).as_str());
         url.query_pairs_mut().append_pair(
             "fields[member]",
-            "patron_status",
+            "patron_status,email",
+        );
+        url.query_pairs_mut().append_pair("include", "user");
+        url.query_pairs_mut().append_pair(
+            "fields[user]",
+            "social_connections,full_name,email",
         );
         self.agent.get(url)
     }
@@ -160,19 +165,33 @@ pub type CampaignMember = ApiDocument<CampaignMemberAttributes>;
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct UserAttributes {
-    pub first_name: String,
-    pub last_name: String,
-    pub full_name: String,
+    pub first_name: Option<String>,
+    pub last_name: Option<String>,
+    pub full_name: Option<String>,
     pub vanity: Option<String>,
     pub about: Option<String>,
-    pub facebook_id: Option<String>,
-    pub image_url: String,
-    pub thumb_url: String,
-    pub youtube: Option<String>,
-    pub twitter: Option<String>,
+    pub social_connections: Option<SocialConnections>,
+    pub image_url: Option<String>,
+    pub thumb_url: Option<String>,
+    pub created: Option<DateTime<Utc>>,
+    pub url: Option<String>,
+}
+
+#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct SocialConnections {
+    pub deviantart: Option<String>,
+    pub discord: Option<DiscordConnection>,
     pub facebook: Option<String>,
-    pub created: DateTime<Utc>,
-    pub url: String,
+    pub reddit: Option<String>,
+    pub spotify: Option<String>,
+    pub twitch: Option<String>,
+    pub twitter: Option<String>,
+    pub youtube: Option<String>,
+}
+
+#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct DiscordConnection {
+    pub user_id: String,
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -195,6 +214,7 @@ pub struct MemberAttributes {
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct CampaignMemberAttributes {
     pub patron_status: Option<PatronStatus>,
+    pub email: String,
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
