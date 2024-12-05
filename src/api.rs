@@ -179,14 +179,7 @@ pub struct UserAttributes {
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct SocialConnections {
-    pub deviantart: Option<String>,
     pub discord: Option<DiscordConnection>,
-    pub facebook: Option<String>,
-    pub reddit: Option<String>,
-    pub spotify: Option<String>,
-    pub twitch: Option<String>,
-    pub twitter: Option<String>,
-    pub youtube: Option<String>,
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
